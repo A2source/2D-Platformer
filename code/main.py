@@ -19,7 +19,7 @@ def main():
     
     player_controls = {'left': ['a', 1073741904], 'jump': ['w', ' ', 1073741906], 'down': ['s', 1073741905], 'right': ['d', 1073741903]}
     
-    player = Player(Controller(), player_controls, 0, 0, 8, 8, 5, 5, 5, [255, 255, 255])
+    player = Player(Controller(), player_controls, 0, 0, 8, 8, 5, 5, 0, 1, [255, 255, 255])
     
     running = True
     while(running):

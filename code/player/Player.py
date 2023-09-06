@@ -3,7 +3,7 @@ import sys
 
 class Player():
     
-    def __init__(self, controller, controls, x, y, w, h, init_speed, init_accel, init_momentum, colour):
+    def __init__(self, controller, controls, x, y, w, h, init_speed, init_accel, init_momentum, max_momentum, colour):
         
         self.controller = controller
         self.controls = controls
@@ -16,6 +16,8 @@ class Player():
         self.speed = init_speed
         self.accel = init_accel
         self.momentum = init_momentum
+        
+        self.max_momentum = max_momentum
         
         self.colour = pygame.Color(colour[0], colour[1], colour[2])
         
@@ -32,6 +34,8 @@ class Player():
     def update(self, surf, events):
         self.draw(surf)
         
+        prev_x = self.x
+        
         self.controller.update(events)
         
         self.moving = False
@@ -40,11 +44,33 @@ class Player():
         if contains(keys, self.controls['left']) or contains(keys, self.controls['right']) or contains(keys, self.controls['down']):
             self.moving = True
             
+        if self.moving:
+            self.momentum += (self.accel + (prev_x - self.x)) / 50
+            
+        if not self.moving and self.momentum > 0:
+            self.momentum -= (self.speed * self.accel) / 2
+            
+        if self.momentum > self.max_momentum:
+            self.momentum = self.max_momentum
+            
         if contains(keys, self.controls['left']):
-            self.x -= self.speed
+            self.x -= self.speed * self.momentum
             
         if contains(keys, self.controls['right']):
-            self.x += self.speed
+            self.x += self.speed * self.momentum
+            
+        # self.y -= (self.accel * self.speed) - 40
+        
+        if self.momentum < 0:
+            self.momentum = 0
+            
+        if self.x < 0:
+            self.x = 250
+            
+        if self.x > 250:
+            self.x = 0
+
+#######################################################
         
 def contains(check_list, elements):
     if type(elements) == list:
