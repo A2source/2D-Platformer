@@ -19,7 +19,7 @@ def main():
     
     player_controls = {'left': ['a', 1073741904], 'jump': ['w', ' ', 1073741906], 'down': ['s', 1073741905], 'right': ['d', 1073741903]}
     
-    player = Player(Controller(), player_controls, 0, 150, 8, 8, init_speed=0, init_accel=0.007, init_decel=0.004, max_speed=3.5, jump_speed=0.05, jump_height=700, colour=[255, 255, 255])
+    player = Player(Controller(), player_controls, 0, 150, 8, 8, init_speed=0, init_accel=0.007, init_v_accel=0.1, init_decel=0.004, max_speed=3.5, max_v_speed=5, jump_speed=3, jump_height=50, colour=[255, 255, 255])
     
     prevT = framerate.get_time()
 

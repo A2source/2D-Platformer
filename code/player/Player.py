@@ -3,7 +3,7 @@ import sys
 
 class Player():
     
-    def __init__(self, controller, controls, x, y, w, h, init_speed, init_accel, init_decel, max_speed, jump_speed, jump_height, colour):
+    def __init__(self, controller, controls, x, y, w, h, init_speed, init_accel, init_v_accel, init_decel, max_speed, max_v_speed, jump_speed, jump_height, colour):
         
         self.controller = controller
         self.controls = controls
@@ -18,9 +18,11 @@ class Player():
         
         self.speed = init_speed
         self.accel = init_accel
+        self.vertical_accel = init_v_accel
         self.decel = init_decel
         
         self.max_speed = max_speed
+        self.max_v_speed = max_v_speed
         
         self.colour = pygame.Color(colour[0], colour[1], colour[2])
         
@@ -85,13 +87,21 @@ class Player():
             
             self.velocity[1] = -self.jump_speed
             
-            self.velocity[1] += (self.jump_speed * self.accel * dt)
+            self.velocity[1] += easeOutQuint(self.jump_speed * self.accel * dt)
             self.init_jump_y = self.y
             
-        if self.jumping:
-            self.cur_jump_height -= self.y - self.init_jump_y
+            if self.cur_jump_height > self.max_jump_height:
+                self.falling = True
+                
+        if contains(keys, self.controls['jump']) and not self.grounded and self.cur_jump_height < 0:
+            self.jumping = False
+            self.grounded = True
+            self.falling = False
             
-        print(self.cur_jump_height)
+            self.cur_jump_height = 0
+            
+        if self.jumping:
+            self.cur_jump_height = -(self.y - self.init_jump_y)
             
         if not contains(keys, self.controls['jump']) and self.jumping or self.cur_jump_height > self.max_jump_height:
             
@@ -99,7 +109,8 @@ class Player():
                 self.velocity[1] = self.jump_speed
                 
             else:
-                self.velocity[1] += easeInQuint((-self.jump_speed * self.accel * dt))
+                print('FALLING WEIRD')
+                self.velocity[1] -= easeInQuint(-self.jump_speed * self.vertical_accel * dt)
             
             self.falling = True
 
@@ -112,7 +123,7 @@ class Player():
                 self.cur_jump_height = 0
         
         self.velocity[0] = clamp(self.velocity[0], -self.max_speed, self.max_speed)
-        self.velocity[1] = clamp(easeOutQuint(self.velocity[1]), -self.max_speed, self.max_speed)
+        self.velocity[1] = clamp(self.velocity[1], -self.max_v_speed, self.max_v_speed)
         
         self.x += self.velocity[0]
         self.y += self.velocity[1]
